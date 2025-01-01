@@ -1,73 +1,33 @@
 pipeline {
-    agent none  // The main Jenkins server won't be used for the build
+    agent any
 
     stages {
-        stage('Setup Node.js and npm on Remote Server') {
-            agent { label 'remote-node' } // This runs on the agent with Node.js installed
+        stage('Checkout Code') {
             steps {
-                script {
-                    // SSH into the remote server
-                    sh 'ssh -o StrictHostKeyChecking=no user@remote-server "node -v && npm -v"'
-                }
+                // Pull the application code from Git repository
+                git branch: 'main', url: 'https://github.com/your-repo/your-project.git'
             }
         }
 
         stage('Install Dependencies') {
-            agent { label 'remote-node' }
             steps {
-                script {
-                    // Run npm install on the remote server
-                    sh 'ssh user@remote-server "cd /path/to/project && npm install"'
-                }
+                // Install npm dependencies
+                sh 'npm install'
             }
         }
 
-        stage('Build Application') {
-            agent { label 'remote-node' }
+        stage('Build Project') {
             steps {
-                script {
-                    // Run build commands on the remote server
-                    sh 'ssh user@remote-server "cd /path/to/project && npm run build"'
-                }
+                // Build the project to generate files in the dist folder
+                sh 'npm run build'
             }
         }
 
-        stage('Prepare Dist Folder') {
-            agent { label 'remote-node' }
+        stage('Archive Artifacts') {
             steps {
-                script {
-                    // Example: Collect build artifacts into the dist folder
-                    sh 'ssh user@remote-server "cd /path/to/project && npm run package"'
-                }
+                // Archive the dist folder as an artifact
+                archiveArtifacts artifacts: 'dist/**', fingerprint: true
             }
-        }
-
-        stage('Upload to Nexus') {
-            agent { label 'remote-node' }
-            steps {
-                script {
-                    // Example of npm pack and upload the artifact to Nexus repository
-                    sh 'ssh user@remote-server "cd /path/to/project && npm pack"'
-                    sh 'curl -u "user:password" --upload-file ./project-name-version.tgz "http://nexus-repo/repository/npm-repository/"'
-                }
-            }
-        }
-
-        stage('Package Application') {
-            steps {
-                script {
-                    // Create a tarball or Docker image, depending on your deployment
-                    sh 'tar -czvf project-name.tar.gz /path/to/dist/'
-                    archiveArtifacts allowEmptyArchive: true, artifacts: 'project-name.tar.gz'
-                }
-            }
-        }
-    }
-
-    post {
-        always {
-            // Clean up or post build actions if needed
-            cleanWs()
         }
     }
 }
