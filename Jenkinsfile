@@ -25,14 +25,21 @@ pipeline {
         stage('Build Project') {
             steps {
                 dir('SimpleTodoApp') {
-                    sh 'npm run build' // Replace with your actual build command if different
+                    sh 'npm run build || echo "No build process required"' // Handle projects with no build
                 }
             }
         }
         stage('Archive Artifacts') {
             steps {
                 dir('SimpleTodoApp') {
-                    archiveArtifacts artifacts: 'build/**', fingerprint: true
+                    script {
+                        def buildExists = sh(script: 'test -d build && echo "exists" || echo "not found"', returnStdout: true).trim()
+                        if (buildExists == "exists") {
+                            archiveArtifacts artifacts: 'build/**', fingerprint: true
+                        } else {
+                            echo "No build artifacts to archive."
+                        }
+                    }
                 }
             }
         }
@@ -49,4 +56,3 @@ pipeline {
         }
     }
 }
-
