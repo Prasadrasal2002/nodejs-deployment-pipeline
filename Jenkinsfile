@@ -1,5 +1,5 @@
 pipeline {
-    agent remote-node
+    agent { label 'remote-node' }
 
     stages {
         stage('Checkout Code') {
