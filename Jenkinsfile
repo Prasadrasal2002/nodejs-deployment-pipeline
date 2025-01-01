@@ -1,36 +1,52 @@
 pipeline {
-    agent { label 'remote-node' }
-
+    agent any
     stages {
-        stage('Verify Environment') {
+        stage('Set Up Workspace') {
             steps {
-                sh 'node --version'
-                sh 'npm --version'
+                echo 'Listing files in workspace:'
+                sh 'ls -la' // Verify initial workspace contents
             }
         }
-
-        stage('Checkout Code') {
+        stage('Navigate to Project Directory') {
             steps {
-                git branch: 'main', url: 'https://github.com/Prasadrasal2002/nodejs-deployment-pipeline.git'
+                dir('SimpleTodoApp') { // Navigate to the correct folder
+                    echo 'Inside SimpleTodoApp folder'
+                    sh 'ls -la' // Verify contents of SimpleTodoApp
+                }
             }
         }
-
         stage('Install Dependencies') {
             steps {
-                sh 'npm install'
+                dir('SimpleTodoApp') { // Ensure commands run inside the project folder
+                    sh 'npm install'
+                }
             }
         }
-
         stage('Build Project') {
             steps {
-                sh 'npm run build'
+                dir('SimpleTodoApp') {
+                    sh 'npm run build' // Replace with your actual build command if different
+                }
             }
         }
-
         stage('Archive Artifacts') {
             steps {
-                archiveArtifacts artifacts: 'dist/**', fingerprint: true
+                dir('SimpleTodoApp') {
+                    archiveArtifacts artifacts: 'build/**', fingerprint: true
+                }
             }
         }
     }
+    post {
+        always {
+            echo 'Pipeline has completed.'
+        }
+        success {
+            echo 'Build completed successfully.'
+        }
+        failure {
+            echo 'Build failed. Check the logs for errors.'
+        }
+    }
 }
+
