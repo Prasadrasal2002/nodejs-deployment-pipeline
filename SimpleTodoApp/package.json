@@ -4,7 +4,8 @@
   "description": "A simple to-do list app",
   "main": "src/app.js",
   "scripts": {
-    "start": "node src/app.js"
+    "start": "node src/app.js",
+    "build": "echo 'No build process required'"
   },
   "dependencies": {
     "express": "^4.18.2"
