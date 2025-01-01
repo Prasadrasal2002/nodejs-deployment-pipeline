@@ -1,11 +1,11 @@
 pipeline {
-    agent any
+    agent remote-node
 
     stages {
         stage('Checkout Code') {
             steps {
                 // Pull the application code from Git repository
-                git branch: 'main', url: 'https://github.com/your-repo/your-project.git'
+                git branch: 'main', url: 'https://github.com/Prasadrasal2002/nodejs-deployment-pipeline.git'
             }
         }
 
