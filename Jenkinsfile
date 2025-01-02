@@ -1,104 +1,59 @@
 pipeline {
-    agent { label 'remote-node' }
-
+    agent any
+    
     environment {
-        REMOTE_SERVER = 'remote@remote' // Update with your remote server username and address
-        REMOTE_PATH = '/home/devops/jenkins' // Update with your desired path on the remote server
-        NEXUS_URL = 'http://localhost:8081/repository/nodejs-repo/' // Update with your Nexus repository URL
-        ARTIFACT_NAME = 'myapp-v1.0.0.tar.gz' // Update with your desired artifact name
-        GITHUB_REPO = 'https://github.com/Prasadrasal2002/nodejs-deployment-pipeline.git' // Update with your GitHub repository URL
+        // Set up any environment variables you need
+        REMOTE_HOST = 'user@remote'
+        REMOTE_PATH = '/path/to/destination'
+        LOCAL_PATH = '/path/to/files'
+        SSH_PRIVATE_KEY = credentials('your-ssh-credentials-id')  // Fetching SSH key from Jenkins credentials
     }
 
     stages {
-        stage('Clone Repository') {
+        stage('Checkout') {
             steps {
-                git branch: 'main', url: "${env.GITHUB_REPO}"
+                echo 'Checking out source code...'
+                checkout scm
             }
         }
 
-        stage('Setup Remote Directory') {
+        stage('Build') {
             steps {
+                echo 'Building project...'
+                // Add your build steps here (e.g., compile, package, etc.)
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo 'Running tests...'
+                // Add your test steps here (e.g., unit tests, integration tests, etc.)
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo 'Deploying project to remote server...'
+                
+                // Make sure the private key is available and use it with ssh-agent for secure deployment
                 script {
-                    sshagent(['jenkins-ssh-key']) {
-                        sh "ssh $REMOTE_SERVER 'mkdir -p $REMOTE_PATH'"
-                    }
+                    // Here, the 'sh' step will be used to securely connect and deploy files
+                    writeFile file: '/tmp/deploy-key', text: SSH_PRIVATE_KEY
+                    sh 'chmod 600 /tmp/deploy-key' // Secure the private key
+                    sh """
+                        export SSHPATH='/tmp/deploy-key'
+                        scp -i \$SSHPATH -r ${LOCAL_PATH} ${REMOTE_HOST}:${REMOTE_PATH}
+                    """
                 }
-            }
-        }
-
-        stage('Copy Files to Remote Server') {
-            steps {
-                script {
-                    sshagent(['jenkins-ssh-key']) {
-                        sh "scp -r . $REMOTE_SERVER:$REMOTE_PATH"
-                    }
-                }
-            }
-        }
-
-        stage('Install Dependencies') {
-            steps {
-                script {
-                    sshagent(['jenkins-ssh-key']) {
-                        sh "ssh $REMOTE_SERVER 'cd $REMOTE_PATH && npm install'"
-                    }
-                }
-            }
-        }
-
-        stage('Build Project') {
-            steps {
-                script {
-                    sshagent(['jenkins-ssh-key']) {
-                        sh "ssh $REMOTE_SERVER 'cd $REMOTE_PATH && npm run build'"
-                    }
-                }
-            }
-        }
-
-        stage('Package Artifact') {
-            steps {
-                script {
-                    sshagent(['jenkins-ssh-key']) {
-                        sh "ssh $REMOTE_SERVER 'cd $REMOTE_PATH && tar -czf $ARTIFACT_NAME dist'"
-                        sh "scp $REMOTE_SERVER:$REMOTE_PATH/$ARTIFACT_NAME ."
-                    }
-                }
-            }
-        }
-
-        stage('Upload to Nexus') {
-            steps {
-                script {
-                    sh "curl -u admin:Pranali@28 --upload-file ./$ARTIFACT_NAME $NEXUS_URL"
-                }
-            }
-        }
-
-        stage('Dockerize (Optional)') {
-            steps {
-                script {
-                    sh "docker build -t myapp-image ."
-                }
-            }
-        }
-
-        stage('Deploy (Optional)') {
-            steps {
-                echo "Deploying application to production..."
             }
         }
     }
 
     post {
         always {
-            echo 'Pipeline completed.'
-        }
-        success {
-            echo 'Build completed successfully.'
-        }
-        failure {
-            echo 'Build failed. Check logs for errors.'
+            echo 'Cleaning up...'
+            // Clean up any resources if needed
+            sh 'rm -f /tmp/deploy-key' // Remove the private key after use
         }
     }
 }
