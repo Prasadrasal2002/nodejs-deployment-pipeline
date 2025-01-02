@@ -55,14 +55,10 @@ pipeline {
 
         stage('Deploy to Remote Server') {
             steps {
-                echo 'Deploying project to remote server...'
-                script {
-                    writeFile file: '/tmp/deploy-key', text: SSH_PRIVATE_KEY
-                    sh 'chmod 600 /tmp/deploy-key'  // Secure the private key
-                    sh """
-                        export SSHPATH='/tmp/deploy-key'
-                        scp -i \$SSHPATH -r ${WORKSPACE}/* ${REMOTE_HOST}:${REMOTE_PATH}
-                    """  // Use SCP to securely copy files to the remote server
+                sshagent(credentials: [SSH_CREDENTIALS]) {
+                    sh '''
+                        scp -r /home/devops/jenkins/workspace/nodejs-pipeline/* remote@remote:/home/devops/jenkins
+                    '''
                 }
             }
         }
