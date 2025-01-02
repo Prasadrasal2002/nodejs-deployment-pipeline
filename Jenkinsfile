@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+     agent { label 'remote-node' }  // Specify the Node.js agent here
 
     environment {
         REMOTE_SERVER = 'remote@remote' // Change this to your remote server's username and address
