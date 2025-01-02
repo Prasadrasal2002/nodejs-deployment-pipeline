@@ -70,9 +70,7 @@ pipeline {
         stage('Upload to Nexus') {
             steps {
                 script {
-                    withCredentials([usernamePassword(credentialsId: 'nexus-credentials', usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
-                        sh "curl -u $NEXUS_USER:$NEXUS_PASS --upload-file ./$ARTIFACT_NAME $NEXUS_URL"
-                    }
+                    sh "curl -u admin:Pranali@28 --upload-file ./$ARTIFACT_NAME $NEXUS_URL"
                 }
             }
         }
