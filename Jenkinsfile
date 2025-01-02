@@ -55,7 +55,7 @@ pipeline {
 
         stage('Deploy to Remote Server') {
             steps {
-                sshagent(credentials: [SSH_CREDENTIALS]) {
+                sshagent(credentials: ['new-new']) {
                     sh '''
                         scp -r /home/devops/jenkins/workspace/nodejs-pipeline/* remote@remote:/home/devops/jenkins
                     '''
