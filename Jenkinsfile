@@ -2,7 +2,7 @@ pipeline {
     agent { label 'nodejs' }
 
     environment {
-        REMOTE_HOST = 'devops@192.168.128.75' // Replace with your actual remote server IP or domain
+        REMOTE_HOST = 'remote@192.168.128.75' // Replace with your actual remote server IP or domain
         REMOTE_PATH = '/home/devops/jenkins'
         SSH_PRIVATE_KEY = credentials('node')
     }
