@@ -1,5 +1,5 @@
 pipeline {
-    agent { label 'remote' }
+    agent { label 'remote-node' }
     
     environment {
         REMOTE_HOST = 'remote@remote'
