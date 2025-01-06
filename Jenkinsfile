@@ -54,34 +54,5 @@ pipeline {
                 archiveArtifacts artifacts: '*.tgz', fingerprint: true
             }
         }
-
-        stage('Deploy to Remote Server') {
-            steps {
-                sshagent(credentials: ['node']) {
-                    sh 'ssh -v remote@192.168.128.75 echo "Connection successful"'
-                }
-            }
-        }
-
-        stage('Upload to Nexus') {
-            steps {
-                echo 'Uploading to Nexus repository...'
-                sh 'curl -u admin:Pranali@28 --upload-file *.tgz http://localhost:8081/repository/nodejs-repo/'
-            }
-        }
-
-        stage('Test Nexus Artifact') {
-            steps {
-                echo 'Testing Nexus artifact availability...'
-                sh 'curl -u admin:Pranali@28 -I http://localhost:8081/repository/nodejs-repo/'
-            }
-        }
-    }
-
-    post {
-        always {
-            echo 'Cleaning up temporary files...'
-            sh 'rm -f /tmp/deploy-key'
-        }
     }
 }
