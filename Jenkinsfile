@@ -55,7 +55,7 @@ pipeline {
 
         stage('Deploy to Remote Server') {
     steps {
-        sshagent(credentials: ['new-new']) {
+        sshagent(credentials: ['node']) {
             sh 'ssh -v remote@remote echo "Connection successful"'
         }
             }
