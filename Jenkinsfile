@@ -1,8 +1,8 @@
 pipeline {
     agent { label 'nodejs' }
-
+    
     environment {
-        REMOTE_HOST = 'remote@192.168.128.75' // Replace with your actual remote server IP or domain
+        REMOTE_HOST = 'remote@192.68.128.75'
         REMOTE_PATH = '/home/devops/jenkins'
         SSH_PRIVATE_KEY = credentials('node')
     }
@@ -54,16 +54,10 @@ pipeline {
         }
 
         stage('Deploy to Remote Server') {
-            steps {
-                sshagent(credentials: ['node']) {
-                    script {
-                        try {
-                            sh 'ssh -v ${REMOTE_HOST} echo "Connection successful"'
-                        } catch (Exception e) {
-                            echo "Error encountered while connecting to the remote server: ${e.getMessage()}"
-                        }
-                    }
-                }
+    steps {
+        sshagent(credentials: ['node']) {
+            sh 'ssh -v remote@192.168.128.75 echo "Connection successful"'
+        }
             }
         }
 
