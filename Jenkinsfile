@@ -70,7 +70,7 @@ pipeline {
         stage('Upload to Nexus') {
             steps {
                 echo 'Uploading to Nexus repository...'
-                sh 'curl -u nexus-username:nexus-password --upload-file *.tgz http://localhost:8081/repository/nodejs-repo/'
+                sh 'curl -u admin:Pranali@28 --upload-file *.tgz http://localhost:8081/repository/nodejs-repo/'
             }
         }
 
