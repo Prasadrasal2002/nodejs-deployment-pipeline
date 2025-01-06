@@ -1,6 +1,6 @@
 pipeline {
     agent { label 'nodejs' }
-    
+
     environment {
         REMOTE_HOST = 'remote@192.68.128.75'
         REMOTE_PATH = '/home/devops/jenkins'
@@ -12,7 +12,8 @@ pipeline {
         stage('Checkout') {
             steps {
                 echo 'Checking out source code...'
-                checkout scm
+                // Explicitly provide Git credentials in the checkout step
+                git credentialsId: 'nodejs-pat', url: 'https://github.com/Prasadrasal2002/nodejs-deployment-pipeline.git', branch: 'main'
             }
         }
 
@@ -55,10 +56,10 @@ pipeline {
         }
 
         stage('Deploy to Remote Server') {
-    steps {
-        sshagent(credentials: ['node']) {
-            sh 'ssh -v remote@192.168.128.75 echo "Connection successful"'
-        }
+            steps {
+                sshagent(credentials: ['node']) {
+                    sh 'ssh -v remote@192.168.128.75 echo "Connection successful"'
+                }
             }
         }
 
