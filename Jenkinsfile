@@ -4,7 +4,7 @@ pipeline {
     environment {
         REMOTE_HOST = 'remote@remote'
         REMOTE_PATH = '/home/devops/jenkins'
-        SSH_PRIVATE_KEY = credentials('new-new')
+        SSH_PRIVATE_KEY = credentials('node')
     }
 
     stages {
