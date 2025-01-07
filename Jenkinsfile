@@ -58,7 +58,7 @@ pipeline {
             steps {
                 sshagent(credentials: ['node-token']) {
                     sh """
-                    ssh $REMOTE_HOST <<EOF
+                    ssh -t $REMOTE_HOST <<EOF
                     cd $REMOTE_PATH
                     npm install
                     npm run build
