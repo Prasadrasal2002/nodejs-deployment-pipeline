@@ -58,11 +58,7 @@ pipeline {
             steps {
                 sshagent(credentials: ['node-token']) {
                     sh """
-                    ssh -o 'StrictHostKeyChecking=no' -o 'UserKnownHostsFile=/dev/null' -t $REMOTE_HOST <<EOF
-                    cd $REMOTE_PATH
-                    npm install
-                    npm run build
-                    EOF
+                    ssh -o 'StrictHostKeyChecking=no' -o 'UserKnownHostsFile=/dev/null' $REMOTE_HOST 'bash -c "cd $REMOTE_PATH && npm install && npm run build"'
                     """
                 }
             }
