@@ -4,16 +4,15 @@ pipeline {
     environment {
         REMOTE_HOST = 'remote@192.68.128.75'
         REMOTE_PATH = '/home/devops/jenkins'
-        SSH_PRIVATE_KEY = credentials('node-token')   //ssh credential agent ID
-        GIT_CREDENTIALS = 'nodejs-pat'  // Reference your credential ID here
+        SSH_PRIVATE_KEY = credentials('node-token')   // SSH credential ID
+        GIT_CREDENTIALS = 'nodejs-pat'               // GitHub personal access token ID
     }
 
     stages {
         stage('Checkout') {
             steps {
                 echo 'Checking out source code...'
-                // Explicitly provide Git credentials in the checkout step
-                git credentialsId: 'nodejs-pat', url: 'https://github.com/Prasadrasal2002/nodejs-deployment-pipeline.git', branch: 'main'
+                git credentialsId: GIT_CREDENTIALS, url: 'https://github.com/Prasadrasal2002/nodejs-deployment-pipeline.git', branch: 'main'
             }
         }
 
@@ -53,6 +52,32 @@ pipeline {
                 sh 'npm pack'
                 archiveArtifacts artifacts: '*.tgz', fingerprint: true
             }
+        }
+
+        stage('Deploy to Remote') {
+            steps {
+                sshagent(credentials: ['node-token']) {
+                    sh """
+                    ssh $REMOTE_HOST <<EOF
+                    cd $REMOTE_PATH
+                    npm install
+                    npm run build
+                    EOF
+                    """
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipeline execution completed.'
+        }
+        success {
+            echo 'Pipeline succeeded!'
+        }
+        failure {
+            echo 'Pipeline failed!'
         }
     }
 }
