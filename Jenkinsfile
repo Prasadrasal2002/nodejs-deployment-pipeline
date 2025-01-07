@@ -4,7 +4,7 @@ pipeline {
     environment {
         REMOTE_HOST = 'remote@192.68.128.75'
         REMOTE_PATH = '/home/devops/jenkins'
-        SSH_PRIVATE_KEY = credentials('node')
+        SSH_PRIVATE_KEY = credentials('node-token')   //ssh credential agent ID
         GIT_CREDENTIALS = 'nodejs-pat'  // Reference your credential ID here
     }
 
