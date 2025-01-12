@@ -16,13 +16,6 @@ pipeline {
             }
         }
 
-        stage('Debug Workspace') {
-            steps {
-                echo 'Listing workspace contents for debugging...'
-                sh 'ls -al'
-            }
-        }
-
         stage('Verify Node.js and npm') {
             steps {
                 echo 'Verifying Node.js and npm versions...'
