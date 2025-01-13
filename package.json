@@ -4,7 +4,7 @@
   "scripts": {
     "build": "echo 'No build process required'",
     "test": "echo 'No tests specified'",
-    "package": "echo 'Packaging the application...'"  // Add this line
+    "package": "echo 'Packaging the application...'"
   },
   "dependencies": {
     "express": "^4.17.1"
