@@ -1,16 +1,13 @@
 {
   "name": "simpletodoapp",
   "version": "1.0.0",
-  "description": "A simple to-do list app",
-  "main": "src/app.js",
   "scripts": {
-    "start": "node src/app.js",
     "build": "echo 'No build process required'",
-    "test": "echo \"No tests specified\""
+    "test": "echo 'No tests specified'",
+    "package": "echo 'Packaging the application...'"  // Add this line
   },
   "dependencies": {
-    "express": "^4.18.2"
-  },
-  "devDependencies": {}
+    "express": "^4.17.1"
+  }
 }
 
