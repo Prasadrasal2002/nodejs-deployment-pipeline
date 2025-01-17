@@ -2,7 +2,6 @@ pipeline {
     agent { label 'agentubuntu' }
     
     tools {
-        git 'Default'
         nodejs 'node'
     }
 
