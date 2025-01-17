@@ -9,7 +9,7 @@ pipeline {
         REMOTE_HOST = '43.204.143.8' // Only the IP/hostname of the remote server
         REMOTE_USER = 'ubuntu'        // Username for SSH connection
         REMOTE_PATH = '/home/devops/jenkins'
-        GIT_CREDENTIALS = 'nodejs-pat' // GitHub personal access token ID
+        GIT_CREDENTIALS = 'git-token' // GitHub personal access token ID
     }
 
     stages {
