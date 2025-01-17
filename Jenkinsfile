@@ -1,11 +1,15 @@
 pipeline {
-    agent { label 'nodejs' }
+    agent { label 'agentubuntu' }
+    
+    tools {
+        nodejs 'node'
+    }
 
     environment {
-        REMOTE_HOST = 'remote@192.168.97.75'
+        REMOTE_HOST = '43.204.143.8' // Only the IP/hostname of the remote server
+        REMOTE_USER = 'ubuntu'        // Username for SSH connection
         REMOTE_PATH = '/home/devops/jenkins'
-        SSH_PRIVATE_KEY = credentials('node-token')   // SSH credential ID
-        GIT_CREDENTIALS = 'nodejs-pat'               // GitHub personal access token ID
+        GIT_CREDENTIALS = 'nodejs-pat' // GitHub personal access token ID
     }
 
     stages {
@@ -49,10 +53,11 @@ pipeline {
 
         stage('Deploy to Remote') {
             steps {
-                sshagent(credentials: ['node-token']) {
-                    sh """
-                    ssh -o 'StrictHostKeyChecking=no' -o 'UserKnownHostsFile=/dev/null' $REMOTE_HOST 'bash -c "cd $REMOTE_PATH && npm install && npm run build"'
-                    """
+                echo 'Deploying package to remote server...'
+                withCredentials([sshUserPrivateKey(credentialsId: 'new-agent-nodejs', keyFileVariable: 'SSH_KEY')]) {
+                    sh(script: '''
+                           scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i $SSH_KEY *.tgz ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH}
+                        ''', returnStatus: true)
                 }
             }
         }
