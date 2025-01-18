@@ -1,15 +1,17 @@
 pipeline {
     agent { label 'agentubuntu' }
-    
+
     tools {
         nodejs 'node'
     }
 
     environment {
-        REMOTE_HOST = '192.168.244.117' // Only the IP/hostname of the remote server
+        REMOTE_HOST = '192.168.244.117' // IP/hostname of the remote server
         REMOTE_USER = 'jenkins'        // Username for SSH connection
         REMOTE_PATH = '/home/devops/jenkins'
         GIT_CREDENTIALS = 'new-git-crd' // GitHub personal access token ID
+        NEXUS_URL = 'http://localhost:8081/repository/nodejs-repo/'
+        NEXUS_CREDENTIALS = 'nexus-credentials-id' // Nexus credentials ID
     }
 
     stages {
@@ -56,9 +58,28 @@ pipeline {
                 echo 'Deploying package to remote server...'
                 withCredentials([sshUserPrivateKey(credentialsId: 'jenkins-ssh-final', keyFileVariable: 'SSH_KEY')]) {
                     sh(script: '''
-                           scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i $SSH_KEY *.tgz ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH}
-                        ''', returnStatus: true)
+                        scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i $SSH_KEY *.tgz ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH}
+                        ssh -i $SSH_KEY ${REMOTE_USER}@${REMOTE_HOST} "cd ${REMOTE_PATH} && tar -xvf *.tgz && npm install"
+                    ''', returnStatus: true)
                 }
+            }
+        }
+
+        stage('Upload to Nexus') {
+            steps {
+                echo 'Uploading artifact to Nexus repository...'
+                withCredentials([usernamePassword(credentialsId: NEXUS_CREDENTIALS, usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
+                    sh(script: '''
+                        curl -v -u $NEXUS_USER:$NEXUS_PASS --upload-file *.tgz $NEXUS_URL
+                    ''')
+                }
+            }
+        }
+
+        stage('Verify API Endpoints') {
+            steps {
+                echo 'Testing API endpoints...'
+                sh 'curl -X GET http://localhost:3000/api/endpoint -w "\\nResponse: %{http_code}\\n"'
             }
         }
     }
