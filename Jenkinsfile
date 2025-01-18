@@ -70,7 +70,10 @@ pipeline {
                 echo 'Uploading artifact to Nexus repository...'
                 withCredentials([usernamePassword(credentialsId: NEXUS_CREDENTIALS, usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
                     sh(script: '''
-                        curl -v -u $NEXUS_USER:$NEXUS_PASS --upload-file *.tgz $NEXUS_URL
+                        curl -v -u $NEXUS_USER:$NEXUS_PASS \
+     --upload-file simpletodoapp-1.0.0.tgz \
+     http://192.168.244.170:8081/repository/nodejs-repo/simpletodoapp-1.0.0.tgz
+
                     ''')
                 }
             }
@@ -79,7 +82,7 @@ pipeline {
         stage('Verify API Endpoints') {
             steps {
                 echo 'Testing API endpoints...'
-                sh 'curl -X GET http://localhost:3000/api/endpoint -w "\\nResponse: %{http_code}\\n"'
+                sh 'curl -X GET http://192.168.244.117:3000/api/endpoint -w "\\nResponse: %{http_code}\\n"'
             }
         }
     }
