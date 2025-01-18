@@ -79,7 +79,8 @@ pipeline {
         stage('Verify API Endpoints') {
             steps {
                 echo 'Testing API endpoints...'
-                sh 'curl -X GET http://localhost:3000/api/endpoint -w "\\nResponse: %{http_code}\\n"'
+                sh 'curl -X GET http://192.168.244.170
+:3000/api/endpoint -w "\\nResponse: %{http_code}\\n"'
             }
         }
     }
