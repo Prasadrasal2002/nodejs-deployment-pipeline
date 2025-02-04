@@ -5,14 +5,15 @@ pipeline {
         nodejs 'node'
     }
 
-    environment {
-        REMOTE_HOST = '192.168.104.117' // IP/hostname of the remote server
-        REMOTE_USER = 'jenkins'        // Username for SSH connection
-        REMOTE_PATH = '/home/jenkins'
-        GIT_CREDENTIALS = 'new-git-crd' // GitHub personal access token ID
-        http://localhost:8081/repository/nodejs-repo/
-        NEXUS_CREDENTIALS = 'nexus-credentials-id' // Nexus credentials ID
-    }
+   environment {
+    REMOTE_HOST = '192.168.104.117' // IP/hostname of the remote server
+    REMOTE_USER = 'jenkins'        // Username for SSH connection
+    REMOTE_PATH = '/home/jenkins'
+    GIT_CREDENTIALS = 'new-git-crd' // GitHub personal access token ID
+    NEXUS_URL = 'http://localhost:8081/repository/nodejs-repo/' // Nexus URL for uploading artifacts
+    NEXUS_CREDENTIALS = 'nexus-credentials-id' // Nexus credentials ID
+}
+
 
     stages {
         stage('Checkout') {
@@ -67,17 +68,17 @@ pipeline {
             }
         }
 
-        stage('Upload to Nexus') {
-            steps {
-                echo 'Uploading artifact to Nexus repository...'
-                withCredentials([usernamePassword(credentialsId: NEXUS_CREDENTIALS, usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
-                    sh(script: '''
-                        curl -v -u $NEXUS_USER:$NEXUS_PASS --upload-file simpletodoapp-1.0.0.tgz http://localhost:8081/repository/nodejs-repo/simpletodoapp-1.0.0.tgz
-
-                    ''')
-                }
-            }
+       stage('Upload to Nexus') {
+    steps {
+        echo 'Uploading artifact to Nexus repository...'
+        withCredentials([usernamePassword(credentialsId: NEXUS_CREDENTIALS, usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
+            sh(script: '''
+                curl -v -u $NEXUS_USER:$NEXUS_PASS --upload-file ${WORKSPACE}/simpletodoapp-1.0.0.tgz ${NEXUS_URL}simpletodoapp-1.0.0.tgz
+            ''')
         }
+    }
+}
+
 
         }
     }
