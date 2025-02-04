@@ -10,7 +10,7 @@ pipeline {
         REMOTE_USER = 'jenkins'        // Username for SSH connection
         REMOTE_PATH = '/home/jenkins'
         GIT_CREDENTIALS = 'new-git-crd' // GitHub personal access token ID
-        NEXUS_URL = 'http://localhost:8081/repository/nodejs-repo'
+        http://localhost:8081/repository/nodejs-repo/
         NEXUS_CREDENTIALS = 'nexus-credentials-id' // Nexus credentials ID
     }
 
