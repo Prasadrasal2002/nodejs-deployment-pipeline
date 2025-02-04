@@ -59,7 +59,8 @@ pipeline {
                 withCredentials([sshUserPrivateKey(credentialsId: 'jenkins-ssh-final', keyFileVariable: 'SSH_KEY')]) {
                     sh(script: '''
                         ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i $SSH_KEY ${REMOTE_USER}@${REMOTE_HOST} \
-    "cd ${REMOTE_PATH} && tar -xvf *.tgz && npm install"
+    "cd ${REMOTE_PATH} && tar -xvf *.tgz && cd package && npm install"
+
 
                     ''', returnStatus: true)
                 }
