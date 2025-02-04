@@ -10,7 +10,7 @@ pipeline {
         REMOTE_USER = 'jenkins'        // Username for SSH connection
         REMOTE_PATH = '/home/devops/jenkins'
         GIT_CREDENTIALS = 'new-git-crd' // GitHub personal access token ID
-        NEXUS_URL = 'http://192.168.244.170:8081/repository/nodejs-repo/'
+        NEXUS_URL = 'http://localhost:8081/repository/nodejs-repo'
         NEXUS_CREDENTIALS = 'nexus-credentials-id' // Nexus credentials ID
     }
 
@@ -72,7 +72,7 @@ pipeline {
                     sh(script: '''
                         curl -v -u $NEXUS_USER:$NEXUS_PASS \
      --upload-file simpletodoapp-1.0.0.tgz \
-     http://192.168.244.170:8081/repository/nodejs-repo/simpletodoapp-1.0.0.tgz
+    $NEXUS_URL/simpletodoapp-1.0.0.tgz
 
                     ''')
                 }
