@@ -72,9 +72,7 @@ pipeline {
                 echo 'Uploading artifact to Nexus repository...'
                 withCredentials([usernamePassword(credentialsId: NEXUS_CREDENTIALS, usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
                     sh(script: '''
-                        curl -v -u $NEXUS_USER:$NEXUS_PASS \
-     --upload-file simpletodoapp-1.0.0.tgz \
-    $NEXUS_URL/simpletodoapp-1.0.0.tgz
+                        curl -v -u $NEXUS_USER:$NEXUS_PASS --upload-file simpletodoapp-1.0.0.tgz http://localhost:8081/repository/nodejs-repo/simpletodoapp-1.0.0.tgz
 
                     ''')
                 }
