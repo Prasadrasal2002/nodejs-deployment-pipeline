@@ -1,7 +1,7 @@
 {
   "name": "simpletodoapp",
   "version": "1.0.0",
-  "groupId": "com.example",  // Custom field for Group ID
+  "groupId": "com.example",  
   "scripts": {
     "build": "echo 'No build process required'",
     "test": "echo 'No tests specified'",
@@ -12,7 +12,7 @@
   },
   "publishConfig": {
     "registry": "http://localhost:8081/repository/nodejs-repo/",
-    "groupId": "com.example"  // Custom Group ID inside publishConfig
+    "groupId": "com.example"  
   }
 }
 
