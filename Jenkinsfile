@@ -6,12 +6,12 @@ pipeline {
     }
 
    environment {
-    REMOTE_HOST = '192.168.104.117' // IP/hostname of the remote server
+    REMOTE_HOST = '192.168.10.232' // IP/hostname of the remote server
     REMOTE_USER = 'jenkins'        // Username for SSH connection
     REMOTE_PATH = '/home/jenkins'
-    GIT_CREDENTIALS = 'new-git-crd' // GitHub personal access token ID
-    NEXUS_URL = 'http://localhost:8081/repository/nodejs-repo/' // Nexus URL for uploading artifacts
-    NEXUS_CREDENTIALS = 'nexus-credentials-id' // Nexus credentials ID
+    GIT_CREDENTIALS = 'jenkins-github' // GitHub personal access token ID
+    NEXUS_URL = 'http://localhost:8081/repository/maven-releases/' // Nexus URL for uploading artifacts
+    NEXUS_CREDENTIALS = 'nexus' // Nexus credentials ID
 }
 
 
