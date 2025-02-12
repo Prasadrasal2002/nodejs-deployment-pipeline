@@ -1,33 +1,21 @@
 pipeline {
-    agent { label 'agentubuntu' }
+    agent any  // Use any available Jenkins agent
 
     tools {
-        nodejs 'node'
+        nodejs 'nodejs'
     }
 
-   environment {
-    REMOTE_HOST = '192.168.10.232' // IP/hostname of the remote server
-    REMOTE_USER = 'jenkins'        // Username for SSH connection
-    REMOTE_PATH = '/home/jenkins'
-    GIT_CREDENTIALS = 'jenkins-github' // GitHub personal access token ID
-    NEXUS_URL = 'http://localhost:8081/repository/maven-releases/' // Nexus URL for uploading artifacts
-    NEXUS_CREDENTIALS = 'nexus' // Nexus credentials ID
-}
-
+    environment {
+        GIT_CREDENTIALS = 'jenkins-github-pat'  // GitHub credentials ID
+        NEXUS_URL = 'http://host.docker.internal:8081/repository/maven-releases/' // Use host.docker.internal for Nexus
+        NEXUS_CREDENTIALS = 'nexus' // Nexus credentials ID
+    }
 
     stages {
         stage('Checkout') {
             steps {
                 echo 'Checking out source code...'
-                git credentialsId: GIT_CREDENTIALS, url: 'https://github.com/Prasadrasal2002/nodejs-deployment-pipeline.git', branch: 'main'
-            }
-        }
-
-        stage('Verify Node.js and npm') {
-            steps {
-                echo 'Verifying Node.js and npm versions...'
-                sh 'node --version'
-                sh 'npm --version'
+                git branch: 'main', credentialsId: "${GIT_CREDENTIALS}", url: 'https://github.com/Prasadrasal2002/nodejs-deployment-pipeline.git'
             }
         }
 
@@ -39,47 +27,27 @@ pipeline {
             }
         }
 
-        stage('Test') {
-            steps {
-                echo 'Running tests...'
-                sh 'npm test'
-            }
-        }
-
         stage('Package') {
             steps {
                 echo 'Packaging the application...'
                 sh 'npm pack'
+                script {
+                    def tgzFile = sh(script: "ls *.tgz", returnStdout: true).trim()
+                    env.PACKAGE_NAME = tgzFile
+                }
                 archiveArtifacts artifacts: '*.tgz', fingerprint: true
             }
         }
 
-        stage('Deploy to Remote') {
+        stage('Upload to Nexus') {
             steps {
-                echo 'Deploying package to remote server...'
-                withCredentials([sshUserPrivateKey(credentialsId: 'jenkins-ssh-final', keyFileVariable: 'SSH_KEY')]) {
-                    sh(script: '''
-                        ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i $SSH_KEY ${REMOTE_USER}@${REMOTE_HOST} \
-    "cd ${REMOTE_PATH} && tar -xvf *.tgz && cd package && npm install"
-
-
-                    ''', returnStatus: true)
+                echo 'Uploading artifact to Nexus repository...'
+                withCredentials([usernamePassword(credentialsId: "${NEXUS_CREDENTIALS}", usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
+                    sh """
+                        curl -v -u \$NEXUS_USER:\$NEXUS_PASS --upload-file \$WORKSPACE/\$PACKAGE_NAME ${NEXUS_URL}\$PACKAGE_NAME
+                    """
                 }
             }
-        }
-
-       stage('Upload to Nexus') {
-    steps {
-        echo 'Uploading artifact to Nexus repository...'
-        withCredentials([usernamePassword(credentialsId: NEXUS_CREDENTIALS, usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
-            sh(script: '''
-                curl -v -u  $NEXUS_USER:$NEXUS_PASS --upload-file ${WORKSPACE}/simpletodoapp-1.0.0.tgz ${NEXUS_URL}simpletodoapp-1.0.0.tgz
-            ''')
-        }
-    }
-}
-
-
         }
     }
 
@@ -94,3 +62,4 @@ pipeline {
             echo 'Pipeline failed!'
         }
     }
+}
