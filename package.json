@@ -11,7 +11,7 @@
     "express": "^4.17.1"
   },
   "publishConfig": {
-    "registry": "http://localhost:8081/repository/npm-release/"
+    "registry": "http://localhost:8081/repository/npm-releases/"
   }
 }
 
