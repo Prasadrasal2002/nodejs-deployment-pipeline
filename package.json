@@ -1,7 +1,7 @@
 {
   "name": "simpletodoapp",
   "version": "1.0.0",
-  "groupId": "com.example",  
+  "main": "app.js",
   "scripts": {
     "build": "echo 'No build process required'",
     "test": "echo 'No tests specified'",
@@ -11,8 +11,7 @@
     "express": "^4.17.1"
   },
   "publishConfig": {
-    "registry": "http://localhost:8081/repository/nodejs-repo/",
-    "groupId": "com.example"  
+    "registry": "http://localhost:8081/repository/npm-release/"
   }
 }
 
