@@ -14,4 +14,5 @@ A simple to-do list app built using Node.js and Express.
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/Prasadrasal2002/nodejs-deployment-pipeline.git
+   ```
